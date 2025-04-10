@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2em;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 2em;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 600px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 1em;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.7em;
+            background: #f0f0f0;
+            margin-bottom: 0.5em;
+            border-radius: 6px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 0.5em;
+        }
+
+        button {
+            padding: 0.4em 0.8em;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .worker {
+            background: #28a745;
+            color: white;
+        }
+
+        .worker:hover {
+            background: #218838;
+        }
+
+        .delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .delete:hover {
+            background: #c82333;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 1em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Admin Panel</h2>
+    <ul id="userList"></ul>
+    <div class="message" id="message"></div>
+</div>
+
+<script>
+    const API_BASE = "/api/admin-panel";
+    const userListEl = document.getElementById("userList");
+    const messageEl = document.getElementById("message");
+
+    function showMessage(msg, color = "green") {
+        messageEl.textContent = msg;
+        messageEl.style.color = color;
+    }
+
+    function fetchUsers() {
+        fetch(`${API_BASE}/users`)
+            .then(res => res.json())
+            .then(users => {
+                userListEl.innerHTML = '';
+                users.forEach(user => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <span>${user.username}</span>
+                        <div class="buttons">
+                            <button class="worker" onclick="setWorker('${user.username}')">Make Worker</button>
+                            <button class="delete" onclick="deleteUser('${user.username}')">Delete</button>
+                        </div>
+                    `;
+                    userListEl.appendChild(li);
+                });
+            })
+            .catch(err => showMessage("Error loading users: " + err.message, "red"));
+    }
+
+    function setWorker(username) {
+        fetch(`${API_BASE}/set-worker?username=${username}`, {
+            method: 'POST'
+        })
+            .then(res => res.text())
+            .then(msg => {
+                showMessage(msg);
+                fetchUsers();
+            })
+            .catch(err => showMessage("Error setting worker role: " + err.message, "red"));
+    }
+
+    function deleteUser(username) {
+        if (!confirm(`Are you sure you want to delete user "${username}"?`)) return;
+
+        fetch(`${API_BASE}/delete-user?username=${username}`, {
+            method: 'DELETE'
+        })
+            .then(res => res.text())
+            .then(msg => {
+                showMessage(msg);
+                fetchUsers();
+            })
+            .catch(err => showMessage("Error deleting user: " + err.message, "red"));
+    }
+
+    // Load users on page load
+    fetchUsers();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,118 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        form {
+            background: white;
+            padding: 2em;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 300px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 1em;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.7em;
+            margin-top: 0.5em;
+            margin-bottom: 1em;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.7em;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .error {
+            color: red;
+            font-size: 0.9em;
+            margin-top: -0.5em;
+            margin-bottom: 1em;
+        }
+
+        .success {
+            color: blue;
+            text-align: center;
+            margin-top: 1em;
+        }
+    </style>
+</head>
+<body>
+
+<form id="registerForm">
+    <h2>Register</h2>
+
+    <input type="text" id="username" placeholder="Username" required />
+    <input type="password" id="password" placeholder="Password" required />
+
+    <div class="error" id="errorMsg"></div>
+
+    <button type="submit">Register</button>
+
+    <div class="success" id="successMsg"></div>
+</form>
+
+<script>
+    document.getElementById("registerForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        const requestData = {
+            username: document.getElementById("username").value,
+            password: document.getElementById("password").value
+        };
+
+        fetch("/api/auth/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(requestData)
+        })
+            .then(async response => {
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText || "Registration failed");
+                }
+                window.location.replace("/");
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById("successMsg").textContent = "Registration successful!";
+                document.getElementById("errorMsg").textContent = "";
+            })
+            .catch(err => {
+                document.getElementById("errorMsg").textContent = err.message;
+                document.getElementById("successMsg").textContent = "";
+            });
+    });
+</script>
+
+</body>
+</html>

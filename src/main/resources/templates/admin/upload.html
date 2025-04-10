@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 2em;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 400px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 1em;
+        }
+
+        .input-group {
+            margin-bottom: 1.5em;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 0.5em;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 0.7em;
+            margin-top: 0.5em;
+            margin-bottom: 1em;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 0.7em;
+            margin-top: 0.5em;
+            margin-bottom: 1em;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.7em;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .message {
+            margin-top: 1.5em;
+            font-size: 1em;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Upload Script</h2>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <div class="input-group">
+            <label for="files">Select Script</label>
+            <input type="file" name="files" id="files" multiple required>
+        </div>
+        <div class="input-group">
+            <label for="directory">Script Name</label>
+            <input type="text" name="directory" id="directory" required>
+        </div>
+        <button type="submit">Upload Files</button>
+    </form>
+
+    <div id="message" class="message"></div>
+</div>
+
+<script>
+    document.getElementById('uploadForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        let formData = new FormData();
+        let files = document.getElementById('files').files;
+        let directory = document.getElementById('directory').value;
+
+        if (files.length === 0 || !directory) {
+            document.getElementById('message').textContent = "Please select files and provide a directory.";
+            return;
+        }
+
+        for (let i = 0; i < files.length; i++) {
+            formData.append('files', files[i]);
+        }
+        formData.append('directory', directory);
+
+        fetch('/api/v1/scripts/upload', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + sessionStorage.getItem('authToken') // Replace with your actual auth token
+            },
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Response data:', data);  // Log to check what you get from the server
+                if (data.status && data.status === "OK") {
+                    document.getElementById('message').textContent = "Files uploaded successfully!";
+                    document.getElementById('message').style.color = "green";
+                } else {
+                    document.getElementById('message').textContent = "Error: " + (data.status || 'Unknown error');
+                    document.getElementById('message').style.color = "red";
+                }
+            })
+            .catch(error => {
+                document.getElementById('message').textContent = "An error occurred while uploading the files.";
+                document.getElementById('message').style.color = "red";
+                console.error('Error during upload:', error);
+            });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Folders</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 2em;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 1em;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.7em;
+            background: #f0f0f0;
+            margin-bottom: 0.5em;
+            border-radius: 6px;
+        }
+
+        button {
+            padding: 0.3em 0.8em;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .error {
+            color: red;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Available scripts</h2>
+    <ul id="folderList"></ul>
+    <div id="error" class="error"></div>
+</div>
+
+<script>
+    window.onload = () => {
+        fetch('/api/v1/scripts/folders', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + sessionStorage.getItem('authToken') // optional
+            }
+        })
+            .then(async response => {
+                const text = await response.text();
+                try {
+                    const data = JSON.parse(text);
+                    const list = document.getElementById('folderList');
+                    list.innerHTML = '';
+                    data.forEach(folder => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                        <span>${folder}</span>
+                        <button onclick="deleteFolder('${folder}')">Delete</button>
+
+                    `;
+                        list.appendChild(li);
+                    });
+                } catch (e) {
+                    document.getElementById('error').textContent = 'Error loading folders: ' + e.message;
+                }
+            })
+            .catch(error => {
+                document.getElementById('error').textContent = 'Fetch error: ' + error.message;
+            });
+    };
+
+    function deleteFolder(folderName) {
+        const token = sessionStorage.getItem('authToken');
+
+        if (!confirm(`Are you sure you want to delete "${folderName}"?`)) {
+            return;
+        }
+
+        fetch(`/api/v1/scripts/${folderName}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    // Refresh the list after successful deletion
+                    window.onload();
+                } else {
+                    return response.text().then(msg => {
+                        throw new Error(msg);
+                    });
+                }
+            })
+            .catch(error => {
+                document.getElementById('error').textContent = 'Delete error: ' + error.message;
+            });
+    }
+</script>
+
+</body>
+</html>
