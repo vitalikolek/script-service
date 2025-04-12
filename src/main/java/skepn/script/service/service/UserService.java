@@ -2,12 +2,15 @@ package skepn.script.service.service;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import skepn.script.service.model.User;
 import skepn.script.service.model.UserRole;
 import skepn.script.service.model.UserRoleType;
 import skepn.script.service.repository.RoleRepository;
 import skepn.script.service.repository.UserRepository;
+import skepn.script.service.security.service.UserDetailsImpl;
 import skepn.script.service.util.GeoUtil;
 
 import java.util.HashSet;
@@ -47,6 +50,16 @@ public class UserService {
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    public User getUser(Authentication authentication) {
+        if (authentication != null && !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated()) {
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            return userRepository.findById(userDetails.getId()).orElse(null);
+            //return userRepository.findByUsername(authentication.getName()).orElse(null);
+        }
+
+        return null;
     }
 
     public void deleteUser(String username) {

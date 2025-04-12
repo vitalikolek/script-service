@@ -81,7 +81,7 @@
             const result = await response.text(); // could be string (error or token) or JSON depending on server response
 
             if (response.ok) {
-                window.location.replace("/folders");
+                window.location.replace("/scripts");
             } else {
                 alert("Login failed: " + result);
             }

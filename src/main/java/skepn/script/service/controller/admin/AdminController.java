@@ -5,22 +5,22 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/admin")
+@RequestMapping("/admin-panel")
 @PreAuthorize("hasRole('ROLE_ADMIN')")
 public class AdminController {
 
     @RequestMapping("/upload")
     public String upload() {
-        return "admin/upload";
+        return "/admin-panel/upload";
     }
 
-    @RequestMapping("/folders")
+    @RequestMapping("/scripts")
     public String folders() {
-        return "admin/folders";
+        return "/admin-panel/scrips";
     }
 
-    @RequestMapping("/admin-panel")
+    @RequestMapping("/users")
     public String adminPanel() {
-        return "admin/admin-panel";
+        return "/admin-panel/users";
     }
 }

@@ -3,7 +3,6 @@ package skepn.script.service.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -73,10 +72,11 @@ public class WebSecurityConfig {
               session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
             }).authorizeHttpRequests(auth -> {
               auth.requestMatchers("/").authenticated()
-                      .requestMatchers(HttpMethod.POST,"/api/auth/**").permitAll()
-                      .requestMatchers("/signin").permitAll()
-                      .requestMatchers("/signup").permitAll()
-                      .anyRequest().authenticated();
+                      .requestMatchers("/scripts").authenticated()
+                      .requestMatchers("/api/v1/scripts/**").authenticated()
+                      .requestMatchers("/api/admin-panel/**").authenticated()
+                      .requestMatchers("/admin-panel/**").authenticated()
+                      .anyRequest().permitAll();
             });
 
     http .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));

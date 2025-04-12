@@ -3,17 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin Panel</title>
+    <link rel="stylesheet" href="../css/Normalize.css">
+    <link rel="stylesheet" href="../css/adminHeader.css">
+    <link rel="stylesheet" href="../css/adminSideBar.css">
     <style>
         body {
+            margin: 0;
             font-family: Arial, sans-serif;
             background: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 2em;
-            min-height: 100vh;
         }
 
+        /* Layout */
+        .page-layout {
+            display: flex;
+        }
+
+        .main {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Admin Panel UI */
         .container {
             background: white;
             padding: 2em;
@@ -56,12 +69,12 @@
         }
 
         .worker {
-            background: #28a745;
+            background: #007765;
             color: white;
         }
 
         .worker:hover {
-            background: #218838;
+            background: #036c5c;
         }
 
         .delete {
@@ -82,10 +95,28 @@
 </head>
 <body>
 
-<div class="container">
-    <h2>Admin Panel</h2>
-    <ul id="userList"></ul>
-    <div class="message" id="message"></div>
+<div class="header">
+    <a href="/" class="logo">Script Service</a>
+    <div class="header-right">
+        <a href="/scripts">Scripts</a>
+        <a href="/api/auth/logout">Log out</a>
+    </div>
+</div>
+
+<div class="page-layout">
+    <div class="sidenav">
+        <a href="./upload">Upload</a>
+        <a href="./scripts">Scripts</a>
+        <a href="./users">Users</a>
+    </div>
+
+    <div class="main">
+        <div class="container">
+            <h2>Admin Panel</h2>
+            <ul id="userList"></ul>
+            <div class="message" id="message"></div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -144,7 +175,6 @@
             .catch(err => showMessage("Error deleting user: " + err.message, "red"));
     }
 
-    // Load users on page load
     fetchUsers();
 </script>
 

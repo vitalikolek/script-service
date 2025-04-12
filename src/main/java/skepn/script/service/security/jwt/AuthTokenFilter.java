@@ -23,7 +23,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
   private static final Logger LOGGER = LoggerFactory.getLogger(AuthTokenFilter.class);
 
   private static final String[] PROTECTED_PATHS = {
-          "/", "/signin", "/signup", "/admin/**", "/api/v1/scripts/**", "/folders", "/api/admin-panel/**",
+          "/", "/signin", "/signup", "/admin/**", "/api/v1/scripts/**", "/scripts", "/api/admin-panel/**", "/admin-panel/**",
   };
 
   @Autowired

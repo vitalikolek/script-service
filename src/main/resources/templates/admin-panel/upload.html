@@ -4,17 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>File Upload</title>
+    <link rel="stylesheet" href="../css/Normalize.css">
+    <link rel="stylesheet" href="../css/adminHeader.css">
+    <link rel="stylesheet" href="../css/adminSideBar.css">
     <style>
         body {
+            margin: 0;
             font-family: Arial, sans-serif;
             background: #f4f4f4;
+        }
+
+        .main {
+            flex: 1;
+            padding: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
         }
 
+        /* Upload form */
         .container {
             background: white;
             padding: 2em;
@@ -38,15 +46,7 @@
             margin-bottom: 0.5em;
         }
 
-        input[type="file"] {
-            width: 100%;
-            padding: 0.7em;
-            margin-top: 0.5em;
-            margin-bottom: 1em;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-        }
-
+        input[type="file"],
         input[type="text"] {
             width: 100%;
             padding: 0.7em;
@@ -59,7 +59,7 @@
         button {
             width: 100%;
             padding: 0.7em;
-            background: #007bff;
+            background: #007765;
             color: white;
             border: none;
             border-radius: 6px;
@@ -68,7 +68,7 @@
         }
 
         button:hover {
-            background: #0056b3;
+            background: #036c5c;
         }
 
         .message {
@@ -76,26 +76,41 @@
             font-size: 1em;
             text-align: center;
         }
-
     </style>
 </head>
 <body>
+<div class="header">
+    <a href="/" class="logo">Script Service</a>
+    <div class="header-right">
+        <a href="/scripts">Scripts</a>
+        <a href="/api/auth/logout">Log out</a>
+    </div>
+</div>
 
-<div class="container">
-    <h2>Upload Script</h2>
-    <form id="uploadForm" enctype="multipart/form-data">
-        <div class="input-group">
-            <label for="files">Select Script</label>
-            <input type="file" name="files" id="files" multiple required>
-        </div>
-        <div class="input-group">
-            <label for="directory">Script Name</label>
-            <input type="text" name="directory" id="directory" required>
-        </div>
-        <button type="submit">Upload Files</button>
-    </form>
+<div class="page-layout">
+    <div class="sidenav">
+        <a href="./upload">Upload</a>
+        <a href="./scripts">Scripts</a>
+        <a href="./users">Users</a>
+    </div>
 
-    <div id="message" class="message"></div>
+    <div class="main">
+        <div class="container">
+            <h2>Upload Script</h2>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <div class="input-group">
+                    <label for="files">Select Script</label>
+                    <input type="file" name="files" id="files" multiple required>
+                </div>
+                <div class="input-group">
+                    <label for="directory">Script Name</label>
+                    <input type="text" name="directory" id="directory" required>
+                </div>
+                <button type="submit">Upload Files</button>
+            </form>
+            <div id="message" class="message"></div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -119,13 +134,12 @@
         fetch('/api/v1/scripts/upload', {
             method: 'POST',
             headers: {
-                'Authorization': 'Bearer ' + sessionStorage.getItem('authToken') // Replace with your actual auth token
+                'Authorization': 'Bearer ' + sessionStorage.getItem('authToken')
             },
             body: formData
         })
             .then(response => response.json())
             .then(data => {
-                console.log('Response data:', data);  // Log to check what you get from the server
                 if (data.status && data.status === "OK") {
                     document.getElementById('message').textContent = "Files uploaded successfully!";
                     document.getElementById('message').style.color = "green";

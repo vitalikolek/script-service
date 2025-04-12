@@ -3,18 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>Upload Folders</title>
+    <link rel="stylesheet" href="../css/Normalize.css">
+    <link rel="stylesheet" href="../css/adminHeader.css">
     <style>
-        body {
+        .folders {
             font-family: Arial, sans-serif;
             background: #f4f4f4;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            height: 90vh;
             margin: 0;
         }
 
-        .container {
+        .folders-container {
             background: white;
             padding: 2em;
             border-radius: 12px;
@@ -46,7 +48,7 @@
 
         button {
             padding: 0.3em 0.8em;
-            background: #007bff;
+            background: #007765;
             color: white;
             border: none;
             border-radius: 6px;
@@ -55,7 +57,7 @@
         }
 
         button:hover {
-            background: #0056b3;
+            background: #036c5c;
         }
 
         .error {
@@ -65,11 +67,20 @@
     </style>
 </head>
 <body>
-
-<div class="container">
-    <h2>Available scripts</h2>
-    <ul id="folderList"></ul>
-    <div id="error" class="error"></div>
+<div class="header">
+    <a href="/" class="logo">Script Service</a>
+    <div class="header-right">
+        <a th:if="${user.isAdmin()}" href="/admin-panel/upload">Admin panel</a>
+        <a href="/scripts">Scripts</a>
+        <a href="/api/auth/logout">Log out</a>
+    </div>
+</div>
+<div class="folders">
+    <div class="folders-container">
+        <h2>Available scripts</h2>
+        <ul id="folderList"></ul>
+        <div id="error" class="error"></div>
+    </div>
 </div>
 
 <script>
@@ -90,7 +101,7 @@
                         const li = document.createElement('li');
                         li.innerHTML = `
                         <span>${folder}</span>
-                        <button onclick="deleteFolder('${folder}')">Delete</button>
+                        <button onclick="downloadFile('${folder}')">Download</button>
 
                     `;
                         list.appendChild(li);
@@ -104,33 +115,21 @@
             });
     };
 
-    function deleteFolder(folderName) {
+    function downloadFile(folderName) {
         const token = sessionStorage.getItem('authToken');
+        const downloadUrl = `/api/v1/scripts/${folderName}`;
 
-        if (!confirm(`Are you sure you want to delete "${folderName}"?`)) {
-            return;
+        // Create hidden <a> to trigger download
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = folderName; // Suggested filename
+        if (token) {
+            // Optional: Use a proxy or trigger authorized download with fetch+blob
+            // OR use your backend to embed token in URL if needed
         }
-
-        fetch(`/api/v1/scripts/${folderName}`, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': 'Bearer ' + token,
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(response => {
-                if (response.ok) {
-                    // Refresh the list after successful deletion
-                    window.onload();
-                } else {
-                    return response.text().then(msg => {
-                        throw new Error(msg);
-                    });
-                }
-            })
-            .catch(error => {
-                document.getElementById('error').textContent = 'Delete error: ' + error.message;
-            });
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     }
 </script>
 
